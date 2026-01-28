@@ -71,3 +71,22 @@ jobs:
 
       - name: Check markdown formatting
         run: make check-format-md
+
+  generate-spec:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GNU sed (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gnu-sed
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Generate specification
+        run: make generate-spec

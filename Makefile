@@ -47,6 +47,10 @@ test: ## Run tests
 clean: ## Clean build artifacts
 	cargo clean
 
+.PHONY: generate-spec
+generate-spec: ## Generate the specification
+	cargo run -- spec build
+
 .PHONY: setup
 setup: ## Setup development environment
 	rustup component add clippy rustfmt
