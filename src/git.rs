@@ -12,7 +12,7 @@ fn get_github_url(filepath: &Path, line: usize) -> Option<String> {
 
 /// runs `git remote -v` and checks if it's a github URL
 fn get_github_repo() -> Option<String> {
-    let res = Command::new("git").args(&["remote", "-v"]).output().ok()?;
+    let res = Command::new("git").args(["remote", "-v"]).output().ok()?;
 
     if !res.status.success() {
         return None;
@@ -26,7 +26,7 @@ fn get_github_repo() -> Option<String> {
 /// runs `git rev-parse --show-toplevel` to get filepath of root
 pub fn get_local_repo_path() -> Option<String> {
     let res = Command::new("git")
-        .args(&["rev-parse", "--show-toplevel"])
+        .args(["rev-parse", "--show-toplevel"])
         .output()
         .ok()?;
 

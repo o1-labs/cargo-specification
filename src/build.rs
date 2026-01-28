@@ -127,7 +127,7 @@ pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Optio
                 // watch any new files contained in the specification
                 for file in new_files_to_watch.difference(&files_to_watch) {
                     watcher
-                        .watch(&file, RecursiveMode::NonRecursive)
+                        .watch(file, RecursiveMode::NonRecursive)
                         .unwrap_or_else(|_e| {
                             panic!("could not find file to watch {}", file.display())
                         });
@@ -135,7 +135,7 @@ pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Optio
 
                 // unwatch files that are not in the specification
                 for file in files_to_watch.difference(&new_files_to_watch) {
-                    watcher.unwatch(&file).unwrap_or_else(|_e| {
+                    watcher.unwatch(file).unwrap_or_else(|_e| {
                         panic!("could not find file to watch {}", file.display())
                     });
                 }
