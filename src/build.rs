@@ -1,4 +1,4 @@
-use clap::ArgEnum;
+use clap::ValueEnum;
 use miette::{IntoDiagnostic, Result, WrapErr};
 use std::{
     collections::HashSet,
@@ -10,7 +10,7 @@ use tinytemplate::TinyTemplate;
 use crate::{comment_parser, errors::SpecError, formats, git::get_local_repo_path, toml_parser};
 
 /// The different specification format that cargo-spec can output
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ArgEnum)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum OutputFormat {
     /// Markdown (the default)
     Markdown,
@@ -98,18 +98,18 @@ pub fn build(
 }
 
 pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Option<PathBuf>) {
-    use notify::{watcher, RecursiveMode, Watcher};
+    use notify::{recommended_watcher, RecursiveMode, Watcher};
     use std::sync::mpsc::channel;
-    use std::time::Duration;
 
     // Create a channel to receive the events.
     let (tx, rx) = channel();
 
     // Create a watcher object, delivering debounced events.
     // The notification back-end is selected based on the platform.
-    let mut watcher = watcher(tx, Duration::from_secs(10)).unwrap();
+    let mut watcher =
+        recommended_watcher(move |res| tx.send(res).expect("failed to send event")).unwrap();
     watcher
-        .watch(toml_spec.clone(), RecursiveMode::NonRecursive)
+        .watch(toml_spec.as_path(), RecursiveMode::NonRecursive)
         .unwrap_or_else(|_e| {
             panic!(
                 "could not watch specification file: {}",
@@ -127,7 +127,7 @@ pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Optio
                 // watch any new files contained in the specification
                 for file in new_files_to_watch.difference(&files_to_watch) {
                     watcher
-                        .watch(file, RecursiveMode::NonRecursive)
+                        .watch(file.as_path(), RecursiveMode::NonRecursive)
                         .unwrap_or_else(|_e| {
                             panic!("could not find file to watch {}", file.display())
                         });
@@ -135,7 +135,7 @@ pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Optio
 
                 // unwatch files that are not in the specification
                 for file in files_to_watch.difference(&new_files_to_watch) {
-                    watcher.unwatch(file).unwrap_or_else(|_e| {
+                    watcher.unwatch(file.as_path()).unwrap_or_else(|_e| {
                         panic!("could not find file to watch {}", file.display())
                     });
                 }

@@ -78,10 +78,10 @@ pub fn init(name: Option<String>, path: PathBuf) -> Result<()> {
     };
 
     let manifest_content =
-        toml::to_vec(&specification).expect("couldn't serialize the default manifest");
+        toml::to_string(&specification).expect("couldn't serialize the default manifest");
 
     manifest_file
-        .write_all(&manifest_content)
+        .write_all(manifest_content.as_bytes())
         .into_diagnostic()
         .wrap_err_with(|| {
             format!(

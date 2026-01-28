@@ -21,7 +21,7 @@ pub enum SpecError {
     #[diagnostic(help("missing a startcode instruction before the endcode"))]
     MissingStartcode {
         #[source_code]
-        _src: NamedSource,
+        _src: NamedSource<String>,
 
         #[label("This bit here")]
         _bad_bit: (usize, usize),
@@ -31,7 +31,7 @@ pub enum SpecError {
     #[diagnostic(help("missing endcode instruction"))]
     MissingEndcode {
         #[source_code]
-        _src: NamedSource,
+        _src: NamedSource<String>,
 
         #[label("this startcode instruction is not terminated")]
         _bad_bit: (usize, usize),
@@ -41,7 +41,7 @@ pub enum SpecError {
     #[diagnostic(help("we are already in a startcode instruction"))]
     DoubleStartcode {
         #[source_code]
-        _src: NamedSource,
+        _src: NamedSource<String>,
 
         #[label("this startcode instruction is invalid")]
         _bad_bit: (usize, usize),
@@ -51,7 +51,7 @@ pub enum SpecError {
     #[diagnostic(help("unrecognized instruction"))]
     BadInstruction {
         #[source_code]
-        _src: NamedSource,
+        _src: NamedSource<String>,
 
         #[label("try spec:startcode or spec:endcode instead")]
         _bad_bit: (usize, usize),
