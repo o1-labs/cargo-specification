@@ -72,6 +72,6 @@ pub fn build(specification: &Specification, content: &str, output_file: Option<P
     };
 
     let mut file = File::create(&output_file).unwrap_or_else(|e| panic!("{}", e));
-    let _ = write!(&mut file, "{}", html_page.render().unwrap()).unwrap();
+    write!(&mut file, "{}", html_page.render().unwrap()).unwrap();
     println!("\n=> html output saved at {}", output_file.display());
 }

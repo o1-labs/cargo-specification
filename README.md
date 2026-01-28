@@ -65,7 +65,7 @@ abstract_modules = "@/src/module.rs" # you can also use absolute paths (you need
 
 ### Template
 
-A template is simply a markdown file that contains placeholders. The path of the template must be specified in the `Specification.toml` file. 
+A template is simply a markdown file that contains placeholders. The path of the template must be specified in the `Specification.toml` file.
 By default the `cargo spec new <NAME>` (or `cargo spec init <PATH>`) command will use `specification_template.md` as template.
 
 ```markdown
@@ -84,7 +84,7 @@ Here's the consensus spec
 
 ### Spec comments in your code
 
-Cargo-spec recognizes comments starting with the tilde `~`. 
+Cargo-spec recognizes comments starting with the tilde `~`.
 For example, in rust:
 
 ```rust
@@ -137,7 +137,7 @@ struct SomeStruct {
 
 ## Continuous Integration
 
-You'll most likely want to enforce that PRs contains up-to-date specification files checked-in. 
+You'll most likely want to enforce that PRs contains up-to-date specification files checked-in.
 You can do this for example with this Github Action:
 
 ```yml

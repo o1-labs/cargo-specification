@@ -59,16 +59,10 @@ check-outdated: ## Check for outdated dependencies
 fix-trailing-whitespace: ## Remove trailing whitespaces from all files
 	@echo "Removing trailing whitespaces from all files..."
 	@find . -type f \( \
-		-name "*.rs" -o -name "*.toml" -o -name "*.md" -o -name "*.yaml" \
-		-o -name "*.yml" -o -name "*.ts" -o -name "*.tsx" \
-		-o -name "*.js" -o -name "*.jsx" -o -name "*.sh" \
-		-o -name "*.py" -o -name "*.go" -o -name "*.c" -o -name "*.h" \
-		-o -name "*.cpp" -o -name "*.hpp" -o -name "*.json" \) \
+		-name "*.rs" -o -name "*.toml" -o -name "*.md" \
+		-o -name "*.yaml" -o -name "*.yml" \) \
 		-not -path "./target/*" \
-		-not -path "./node_modules/*" \
 		-not -path "./.git/*" \
-		-not -path "./dist/*" \
-		-not -path "./build/*" \
 		-exec sh -c \
 			'echo "Processing: $$1"; $(SED) -i -e "s/[[:space:]]*$$//" "$$1"' \
 			_ {} \; && \
@@ -78,16 +72,10 @@ fix-trailing-whitespace: ## Remove trailing whitespaces from all files
 check-trailing-whitespace: ## Check for trailing whitespaces in source files
 	@echo "Checking for trailing whitespaces..."
 	@files_with_trailing_ws=$$(find . -type f \( \
-		-name "*.rs" -o -name "*.toml" -o -name "*.md" -o -name "*.yaml" \
-		-o -name "*.yml" -o -name "*.ts" -o -name "*.tsx" \
-		-o -name "*.js" -o -name "*.jsx" -o -name "*.sh" \
-		-o -name "*.py" -o -name "*.go" -o -name "*.c" -o -name "*.h" \
-		-o -name "*.cpp" -o -name "*.hpp" -o -name "*.json" \) \
+		-name "*.rs" -o -name "*.toml" -o -name "*.md" \
+		-o -name "*.yaml" -o -name "*.yml" \) \
 		-not -path "./target/*" \
-		-not -path "./node_modules/*" \
 		-not -path "./.git/*" \
-		-not -path "./dist/*" \
-		-not -path "./build/*" \
 		-exec grep -l '[[:space:]]$$' {} + 2>/dev/null || true); \
 	if [ -n "$$files_with_trailing_ws" ]; then \
 		echo "Files with trailing whitespaces found:"; \
