@@ -117,8 +117,8 @@ pub fn parse_code(
                 "startcode" if extract_code.is_some() => {
                     let column = line.find("startcode").unwrap();
                     return Err(SpecError::DoubleStartcode {
-                        src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
-                        bad_bit: (byte_offset_for_errors + column, "startcode".len()),
+                        _src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
+                        _bad_bit: (byte_offset_for_errors + column, "startcode".len()),
                     })
                     .into_diagnostic();
                 }
@@ -130,8 +130,8 @@ pub fn parse_code(
                 "endcode" if extract_code.is_none() => {
                     let column = line.find("endcode").unwrap();
                     return Err(SpecError::MissingStartcode {
-                        src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
-                        bad_bit: (byte_offset_for_errors + column, "endcode".len()),
+                        _src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
+                        _bad_bit: (byte_offset_for_errors + column, "endcode".len()),
                     })
                     .into_diagnostic();
                 }
@@ -140,8 +140,8 @@ pub fn parse_code(
                     let column = line.find("spec:").unwrap();
                     let instruction = line.split_once("spec:").unwrap().1;
                     Err(SpecError::BadInstruction {
-                        src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
-                        bad_bit: (byte_offset_for_errors + column, 0),
+                        _src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
+                        _bad_bit: (byte_offset_for_errors + column, 0),
                     })
                     .wrap_err_with(|| format!("the instruction you gave: {instruction}"))?;
                 }
@@ -194,8 +194,8 @@ pub fn parse_code(
     //~    is matched with a endcode instruction
     if let Some(offset) = extract_code {
         return Err(SpecError::MissingEndcode {
-            src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
-            bad_bit: (offset, 0),
+            _src: NamedSource::new(file_name.to_string_lossy(), source.to_string()),
+            _bad_bit: (offset, 0),
         })
         .into_diagnostic();
     }
