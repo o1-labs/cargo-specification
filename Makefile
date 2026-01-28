@@ -55,6 +55,22 @@ setup: ## Setup development environment
 check-outdated: ## Check for outdated dependencies
 	cargo outdated || true
 
+.PHONY: check-format-md
+check-format-md: ## Check markdown formatting
+	npx prettier --check "**/*.md"
+
+.PHONY: format-md
+format-md: ## Format markdown files
+	npx prettier --write "**/*.md"
+
+.PHONY: check-format-yaml
+check-format-yaml: ## Check YAML formatting
+	npx prettier --check "**/*.yaml" "**/*.yml"
+
+.PHONY: format-yaml
+format-yaml: ## Format YAML files
+	npx prettier --write "**/*.yaml" "**/*.yml"
+
 .PHONY: fix-trailing-whitespace
 fix-trailing-whitespace: ## Remove trailing whitespaces from all files
 	@echo "Removing trailing whitespaces from all files..."

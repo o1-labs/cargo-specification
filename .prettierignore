@@ -1,0 +1,11 @@
+# Build outputs
+target/
+
+# Generated files
+*.lock
+
+# Config files
+*.toml
+
+# Changelog
+CHANGELOG.md
