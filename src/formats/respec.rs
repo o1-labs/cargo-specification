@@ -1,7 +1,7 @@
 use askama::Template;
 use comrak::{
-    markdown_to_html, ComrakExtensionOptions, ComrakOptions, ComrakParseOptions,
-    ComrakRenderOptions,
+    markdown_to_html,
+    options::{Extension, Options, Parse, Render},
 };
 use std::{fs::File, io::Write as IOWrite, path::PathBuf};
 
@@ -22,34 +22,35 @@ pub fn build(specification: &Specification, content: &str, output_file: Option<P
     let output_file = output_file.unwrap_or_else(|| PathBuf::from("specification.html"));
 
     //~ - converts markdown content to pure HTML
-    let content = markdown_to_html(
-        content,
-        &ComrakOptions {
-            extension: ComrakExtensionOptions {
-                strikethrough: true,
-                tagfilter: true,
-                table: true,
-                autolink: true,
-                tasklist: true,
-                superscript: true,
-                header_ids: None,
-                footnotes: true,
-                description_lists: true,
-                front_matter_delimiter: None,
-            },
-            parse: ComrakParseOptions {
-                smart: true,
-                default_info_string: None,
-            },
-            render: ComrakRenderOptions {
-                hardbreaks: false,
-                github_pre_lang: true,
-                width: 0,
-                unsafe_: true, // it's our spec afterall
-                escape: false,
-            },
+    let options = Options {
+        extension: Extension {
+            strikethrough: true,
+            tagfilter: true,
+            table: true,
+            autolink: true,
+            tasklist: true,
+            superscript: true,
+            header_ids: None,
+            footnotes: true,
+            description_lists: true,
+            front_matter_delimiter: None,
+            ..Default::default()
         },
-    );
+        parse: Parse {
+            smart: true,
+            default_info_string: None,
+            ..Default::default()
+        },
+        render: Render {
+            hardbreaks: false,
+            github_pre_lang: true,
+            width: 0,
+            r#unsafe: true, // it's our spec afterall
+            escape: false,
+            ..Default::default()
+        },
+    };
+    let content = markdown_to_html(content, &options);
 
     //~ - produces the HTML output
     let html_page = Respec {

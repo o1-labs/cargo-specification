@@ -24,7 +24,7 @@ enum Spec {
 
     /// Creates the necessary files to start a specification in an existing directory
     Init {
-        #[clap(parse(from_os_str), value_name = "SPEC_DIR")]
+        #[clap(value_name = "SPEC_DIR")]
         path: PathBuf,
     },
 
@@ -41,17 +41,17 @@ enum Spec {
 #[clap(author, version, about, bin_name = "cargo")]
 struct Opt {
     /// The path to the specification toml file (defaults to Specification.toml).
-    #[clap(short, long, parse(from_os_str), value_name = "SPEC_PATH")]
+    #[clap(short, long, value_name = "SPEC_PATH")]
     specification_path: Option<PathBuf>,
 
     /// The path to the specification file to write
     /// (defaults to specification.md or specification.html)
-    #[clap(short, long, parse(from_os_str), value_name = "OUTPUT_FILE")]
+    #[clap(short, long, value_name = "OUTPUT_FILE")]
     output_file: Option<PathBuf>,
 
     /// The output format (defaults to markdown)
     #[clap(short = 'f', long, value_name = "OUTPUT_FORMAT")]
-    #[clap(arg_enum)]
+    #[clap(value_enum)]
     output_format: Option<OutputFormat>,
 }
 
