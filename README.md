@@ -170,21 +170,21 @@ flavor = "docusaurus"
 
 ### Available flavors
 
-| Flavor | Description |
-|--------|-------------|
-| `mdbook` | Default. Passthrough with no transformations. |
+| Flavor       | Description                                                 |
+| ------------ | ----------------------------------------------------------- |
+| `mdbook`     | Default. Passthrough with no transformations.               |
 | `docusaurus` | Transforms mdBook syntax to Docusaurus-compatible markdown. |
 
 ### Docusaurus transformations
 
 When using `--flavor docusaurus`, the following transformations are applied:
 
-| Feature | mdBook syntax | Docusaurus syntax |
-|---------|---------------|-------------------|
-| Admonitions | ` ```admonish warning ` | `:::warning` |
-| Math environments | `\begin{align}` | `\begin{aligned}` |
-| TOC markers | `<!-- toc -->` | (removed) |
-| Math underscores | `$x\_1$` | `$x_1$` |
+| Feature           | mdBook syntax           | Docusaurus syntax |
+| ----------------- | ----------------------- | ----------------- |
+| Admonitions       | ` ```admonish warning ` | `:::warning`      |
+| Math environments | `\begin{align}`         | `\begin{aligned}` |
+| TOC markers       | `<!-- toc -->`          | (removed)         |
+| Math underscores  | `$x\_1$`                | `$x_1$`           |
 
 > **Note**: The CLI flag takes precedence over the config file setting.
 
