@@ -210,6 +210,188 @@ This is dangerous!
 }
 
 #[test]
+fn test_admonition_plain_defaults_to_note_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish
+This is a plain admonition without a type.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::note"));
+    assert!(result.contains("This is a plain admonition without a type."));
+    assert!(!result.contains("```admonish"));
+}
+
+#[test]
+fn test_admonition_with_title_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish warning "Custom Warning Title"
+This warning has a custom title.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::warning"));
+    assert!(result.contains("This warning has a custom title."));
+    assert!(!result.contains("```admonish"));
+}
+
+#[test]
+fn test_admonition_example_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish example
+This is an example.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::example"));
+    assert!(result.contains("This is an example."));
+}
+
+#[test]
+fn test_admonition_bug_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish bug
+Known bug description.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::bug"));
+    assert!(result.contains("Known bug description."));
+}
+
+#[test]
+fn test_admonition_quote_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish quote
+A famous quote here.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::quote"));
+    assert!(result.contains("A famous quote here."));
+}
+
+#[test]
+fn test_admonition_abstract_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish abstract
+This is an abstract.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::abstract"));
+    assert!(result.contains("This is an abstract."));
+}
+
+#[test]
+fn test_admonition_success_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish success
+Operation completed successfully.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::success"));
+    assert!(result.contains("Operation completed successfully."));
+}
+
+#[test]
+fn test_admonition_question_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish question
+Frequently asked question here.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::question"));
+    assert!(result.contains("Frequently asked question here."));
+}
+
+#[test]
+fn test_admonition_failure_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+```admonish failure
+This operation failed.
+```
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    assert!(result.contains(":::failure"));
+    assert!(result.contains("This operation failed."));
+}
+
+#[test]
 fn test_multiple_admonitions_docusaurus() {
     let dir = TempDir::new().unwrap();
     let spec_path = setup_test_spec(

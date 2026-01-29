@@ -17,9 +17,11 @@ impl MarkdownTransformer for DocusaurusTransformer {
 
 /// Transform mdBook admonitions to Docusaurus format
 /// ```` ```admonish warning ```` -> `:::warning`
+/// ```` ```admonish ```` -> `:::note` (default type)
 /// Closing ``` -> `:::`
 fn transform_admonitions(content: &str) -> String {
-    let re = Regex::new(r"```admonish\s+(\w+)").unwrap();
+    // Match ```admonish with optional type (defaults to "note")
+    let re = Regex::new(r"^```admonish(?:\s+(\w+))?(?:\s.*)?$").unwrap();
     let mut result = String::new();
     let mut in_admonition = false;
     let mut admonition_indent = String::new();
@@ -29,7 +31,7 @@ fn transform_admonitions(content: &str) -> String {
         let current_indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
 
         if let Some(caps) = re.captures(trimmed) {
-            let admonition_type = &caps[1];
+            let admonition_type = caps.get(1).map_or("note", |m| m.as_str());
             in_admonition = true;
             admonition_indent = current_indent.clone();
             result.push_str(&format!("{}:::{}\n", current_indent, admonition_type));
@@ -113,6 +115,66 @@ mod tests {
         let input = "```admonish info\nSome information\n```";
         let expected = ":::info\nSome information\n:::";
         assert_eq!(transform_admonitions(input), expected);
+    }
+
+    #[test]
+    fn test_transform_admonitions_plain_defaults_to_note() {
+        let input = "```admonish\nThis is a plain admonition\n```";
+        let expected = ":::note\nThis is a plain admonition\n:::";
+        assert_eq!(transform_admonitions(input), expected);
+    }
+
+    #[test]
+    fn test_transform_admonitions_with_title() {
+        // mdBook-admonish supports titles like: ```admonish warning "Custom Title"
+        let input = "```admonish warning \"Custom Title\"\nWarning with title\n```";
+        let expected = ":::warning\nWarning with title\n:::";
+        assert_eq!(transform_admonitions(input), expected);
+    }
+
+    #[test]
+    fn test_transform_admonitions_all_types() {
+        // Test all mdBook-admonish types
+        let types = [
+            "note",
+            "abstract",
+            "summary",
+            "tldr",
+            "info",
+            "todo",
+            "tip",
+            "hint",
+            "important",
+            "success",
+            "check",
+            "done",
+            "question",
+            "help",
+            "faq",
+            "warning",
+            "caution",
+            "attention",
+            "failure",
+            "fail",
+            "missing",
+            "danger",
+            "error",
+            "bug",
+            "example",
+            "quote",
+            "cite",
+        ];
+
+        for admonish_type in types {
+            let input = format!("```admonish {}\nContent\n```", admonish_type);
+            let expected = format!(":::{}\nContent\n:::", admonish_type);
+            assert_eq!(
+                transform_admonitions(&input),
+                expected,
+                "Failed for type: {}",
+                admonish_type
+            );
+        }
     }
 
     #[test]
