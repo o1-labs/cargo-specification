@@ -1,8 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
+use std::{collections::HashMap, fs::File, io::Read, path::Path};
 
 use miette::{IntoDiagnostic, Result, WrapErr};
 
@@ -14,6 +11,9 @@ pub struct Specification {
     pub metadata: Metadata,
     /// configuration of the specification
     pub config: Config,
+    /// output configuration (optional)
+    #[serde(default)]
+    pub output: Option<OutputConfig>,
     /// files to use for the specification's content
     pub sections: HashMap<String, String>,
 }
@@ -22,6 +22,14 @@ pub struct Specification {
 pub struct Config {
     /// main template file
     pub template: String,
+}
+
+/// Output configuration for the specification
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct OutputConfig {
+    /// The markdown flavor to use (mdbook or docusaurus)
+    #[serde(default)]
+    pub flavor: Option<String>,
 }
 
 /// Metadata about a specification

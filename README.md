@@ -152,6 +152,42 @@ struct SomeStruct {
 //~ spec:endcode
 ```
 
+## Markdown Flavors
+
+cargo-spec supports different markdown flavors for compatibility with various
+documentation platforms. Use the `--flavor` (or `-F`) flag to select:
+
+```console
+$ cargo spec build --flavor docusaurus
+```
+
+Or configure it in `Specification.toml`:
+
+```toml
+[output]
+flavor = "docusaurus"
+```
+
+### Available flavors
+
+| Flavor       | Description                                                 |
+| ------------ | ----------------------------------------------------------- |
+| `mdbook`     | Default. Passthrough with no transformations.               |
+| `docusaurus` | Transforms mdBook syntax to Docusaurus-compatible markdown. |
+
+### Docusaurus transformations
+
+When using `--flavor docusaurus`, the following transformations are applied:
+
+| Feature           | mdBook syntax           | Docusaurus syntax |
+| ----------------- | ----------------------- | ----------------- |
+| Admonitions       | ` ```admonish warning ` | `:::warning`      |
+| Math environments | `\begin{align}`         | `\begin{aligned}` |
+| TOC markers       | `<!-- toc -->`          | (removed)         |
+| Math underscores  | `$x\_1$`                | `$x_1$`           |
+
+> **Note**: The CLI flag takes precedence over the config file setting.
+
 ## Continuous Integration
 
 You'll most likely want to enforce that PRs contains up-to-date specification

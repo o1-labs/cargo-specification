@@ -74,6 +74,7 @@ pub fn init(name: Option<String>, path: PathBuf) -> Result<()> {
     let specification = Specification {
         metadata,
         config,
+        output: None,
         sections: HashMap::new(),
     };
 

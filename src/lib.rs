@@ -4,4 +4,5 @@ mod errors;
 mod formats;
 mod git;
 pub mod init;
-mod toml_parser;
+pub mod toml_parser;
+pub mod transformers;

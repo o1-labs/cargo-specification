@@ -1,7 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::path::Path;
-use std::process::Command;
+use std::{path::Path, process::Command};
 
 fn get_github_url(filepath: &Path, line: usize) -> Option<String> {
     let local_repo = get_local_repo_path()?;

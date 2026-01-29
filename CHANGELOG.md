@@ -4,8 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add `--flavor`/`-F` CLI flag for markdown flavor selection (mdbook, docusaurus)
+  ([#4](https://github.com/o1-labs/cargo-specification/pull/4))
+- Add `[output]` config section with optional `flavor` field
+  ([#4](https://github.com/o1-labs/cargo-specification/pull/4))
+- Docusaurus flavor transforms: admonitions (`:::warning`), math align
+  (`\begin{aligned}`), TOC marker removal, math underscore escaping
+  ([#4](https://github.com/o1-labs/cargo-specification/pull/4))
+
 ### Changed
 
+- Use nightly rustfmt with mina-rust config (imports_granularity = "Crate")
+  ([#4](https://github.com/o1-labs/cargo-specification/pull/4))
 - Updated all dependencies to latest versions (askama 0.15.4, clap 4.5.55,
   comrak 0.50.0, miette 7.6.0, notify 8.2.0, serde 1.0.228, thiserror 2.0.18,
   tinytemplate 1.2.1, toml 0.9.11)
