@@ -1,6 +1,7 @@
 use cargo_spec::{
-    build::{build, watch, OutputFormat},
+    build::{build, watch, MarkdownFlavor, OutputFormat},
     init::{init, new, DEFAULT_MANIFEST, DEFAULT_TEMPLATE},
+    toml_parser,
 };
 use clap::{Args, Parser, Subcommand};
 use miette::Result;
@@ -53,6 +54,40 @@ struct Opt {
     #[clap(short = 'f', long, value_name = "OUTPUT_FORMAT")]
     #[clap(value_enum)]
     output_format: Option<OutputFormat>,
+
+    /// The markdown flavor to use (mdbook or docusaurus)
+    #[clap(short = 'F', long, value_name = "MARKDOWN_FLAVOR")]
+    #[clap(value_enum)]
+    flavor: Option<MarkdownFlavor>,
+}
+
+/// Resolve the markdown flavor from CLI, config file, or default.
+/// Priority: CLI flag > config file > default (Mdbook)
+fn resolve_flavor(
+    cli_flavor: Option<MarkdownFlavor>,
+    toml_spec: &std::path::Path,
+) -> Result<MarkdownFlavor> {
+    // CLI flag takes precedence
+    if let Some(flavor) = cli_flavor {
+        return Ok(flavor);
+    }
+
+    // Try to read from config file
+    if toml_spec.exists() {
+        let spec = toml_parser::parse_toml_spec(toml_spec)?;
+        if let Some(output_config) = spec.output {
+            if let Some(flavor_str) = output_config.flavor {
+                return match flavor_str.to_lowercase().as_str() {
+                    "mdbook" => Ok(MarkdownFlavor::Mdbook),
+                    "docusaurus" => Ok(MarkdownFlavor::Docusaurus),
+                    _ => Ok(MarkdownFlavor::default()),
+                };
+            }
+        }
+    }
+
+    // Default
+    Ok(MarkdownFlavor::default())
 }
 
 fn main() -> Result<()> {
@@ -83,11 +118,13 @@ fn main() -> Result<()> {
             specification_path,
             output_file,
             output_format,
+            flavor,
         }) => {
             let toml_spec = specification_path.unwrap_or_else(|| PathBuf::from(DEFAULT_MANIFEST));
             let output_format = output_format.unwrap_or(OutputFormat::Markdown);
+            let flavor = resolve_flavor(flavor, &toml_spec)?;
 
-            let _ = build(toml_spec, output_file, output_format)?;
+            let _ = build(toml_spec, output_file, output_format, flavor)?;
         }
 
         //~   b. the `Watch` mode builds the specification on every change
@@ -95,11 +132,13 @@ fn main() -> Result<()> {
             specification_path,
             output_file,
             output_format,
+            flavor,
         }) => {
             let toml_spec = specification_path.unwrap_or_else(|| PathBuf::from(DEFAULT_MANIFEST));
             let output_format = output_format.unwrap_or(OutputFormat::Markdown);
+            let flavor = resolve_flavor(flavor, &toml_spec)?;
 
-            watch(toml_spec, output_format, output_file);
+            watch(toml_spec, output_format, output_file, flavor);
         }
     };
 

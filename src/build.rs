@@ -7,7 +7,9 @@ use std::{
 };
 use tinytemplate::TinyTemplate;
 
-use crate::{comment_parser, errors::SpecError, formats, git::get_local_repo_path, toml_parser};
+use crate::{
+    comment_parser, errors::SpecError, formats, git::get_local_repo_path, toml_parser, transformers,
+};
 
 /// The different specification format that cargo-spec can output
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -19,11 +21,23 @@ pub enum OutputFormat {
     Respec,
 }
 
+/// The markdown flavor to use when outputting markdown
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum MarkdownFlavor {
+    /// mdBook flavor (the default) - preserves content unchanged
+    #[default]
+    Mdbook,
+
+    /// Docusaurus flavor - transforms admonitions, math, TOC markers
+    Docusaurus,
+}
+
 /// Builds the specification and returns a number of files to watch
 pub fn build(
     toml_spec: PathBuf,
     output_file: Option<PathBuf>,
     output_format: OutputFormat,
+    flavor: MarkdownFlavor,
 ) -> Result<HashSet<PathBuf>> {
     let mut files_to_watch = HashSet::new();
 
@@ -86,7 +100,10 @@ pub fn build(
     use OutputFormat::*;
     match output_format {
         //~     - [markdown](https://daringfireball.net/projects/markdown/)
-        Markdown => formats::markdown::build(&rendered, output_file),
+        Markdown => {
+            let transformed = transformers::get_transformer(flavor).transform(&rendered);
+            formats::markdown::build(&transformed, output_file);
+        }
         //~     - [respec](https://github.com/w3c/respec/)
         Respec => {
             formats::respec::build(&specification, &rendered, output_file);
@@ -97,7 +114,12 @@ pub fn build(
     Ok(files_to_watch)
 }
 
-pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Option<PathBuf>) {
+pub fn watch(
+    toml_spec: PathBuf,
+    output_format: OutputFormat,
+    output_file: Option<PathBuf>,
+    flavor: MarkdownFlavor,
+) {
     use notify::{recommended_watcher, RecursiveMode, Watcher};
     use std::sync::mpsc::channel;
 
@@ -121,7 +143,12 @@ pub fn watch(toml_spec: PathBuf, output_format: OutputFormat, output_file: Optio
 
     loop {
         // build and get files to watch
-        match build(toml_spec.clone(), output_file.clone(), output_format) {
+        match build(
+            toml_spec.clone(),
+            output_file.clone(),
+            output_format,
+            flavor,
+        ) {
             Err(e) => println!("error: {}", e),
             Ok(new_files_to_watch) => {
                 // watch any new files contained in the specification
