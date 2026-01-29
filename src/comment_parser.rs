@@ -1,5 +1,4 @@
-use std::fmt::Write as FmtWrite;
-use std::path::Path;
+use std::{fmt::Write as FmtWrite, path::Path};
 
 use miette::{IntoDiagnostic, NamedSource, Result, WrapErr};
 

@@ -28,12 +28,12 @@ check: ## Check code for compilation errors
 	cargo check
 
 .PHONY: check-format
-check-format: ## Check code formatting
-	cargo fmt -- --check
+check-format: ## Check code formatting (requires nightly)
+	cargo +nightly fmt -- --check
 
 .PHONY: format
-format: ## Format code
-	cargo fmt
+format: ## Format code (requires nightly)
+	cargo +nightly fmt
 
 .PHONY: lint
 lint: ## Run linter
@@ -53,7 +53,8 @@ generate-spec: ## Generate the specification
 
 .PHONY: setup
 setup: ## Setup development environment
-	rustup component add clippy rustfmt
+	rustup component add clippy
+	rustup toolchain install nightly --component rustfmt
 
 .PHONY: check-outdated
 check-outdated: ## Check for outdated dependencies

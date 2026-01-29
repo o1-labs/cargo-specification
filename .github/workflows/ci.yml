@@ -15,9 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
+      - name: Install nightly toolchain with rustfmt
+        run: rustup toolchain install nightly --component rustfmt
 
       - name: Check formatting
         run: make check-format
