@@ -10,6 +10,7 @@ impl MarkdownTransformer for DocusaurusTransformer {
     fn transform(&self, content: &str) -> String {
         let content = transform_admonitions(content);
         let content = transform_math_align(&content);
+        let content = split_math_delimiters(&content);
         let content = remove_toc_markers(&content);
         transform_math_underscores(&content)
     }
@@ -58,6 +59,22 @@ fn transform_math_align(content: &str) -> String {
     content
         .replace(r"\begin{align}", r"\begin{aligned}")
         .replace(r"\end{align}", r"\end{aligned}")
+}
+
+/// Split math block delimiters onto separate lines for remark-math compatibility
+/// `$$\begin{aligned}` -> `$$\n\begin{aligned}`
+/// `\end{aligned}$$` -> `\end{aligned}\n$$`
+fn split_math_delimiters(content: &str) -> String {
+    // Split opening: $$\begin{...} -> $$\n\begin{...}
+    // Note: $$ in replacement string means literal $ in regex
+    let re_open = Regex::new(r"\$\$\\begin\{").unwrap();
+    let content = re_open.replace_all(content, "$$$$\n\\begin{").to_string();
+
+    // Split closing: \end{...}$$ -> \end{...}\n$$
+    let re_close = Regex::new(r"\\end\{([^}]+)\}\$\$").unwrap();
+    re_close
+        .replace_all(&content, "\\end{$1}\n$$$$")
+        .to_string()
 }
 
 /// Remove `<!-- toc -->` markers used by mdBook for table of contents
@@ -205,6 +222,58 @@ c &= d
 \end{aligned}
 $$";
         assert_eq!(transform_math_align(input), expected);
+    }
+
+    #[test]
+    fn test_split_math_delimiters_inline_block() {
+        // This is the problematic pattern from kimchi
+        let input = r"$$\begin{aligned}
+    & z(x) \cdot zkpm(x)
+\end{aligned}$$";
+        let expected = r"$$
+\begin{aligned}
+    & z(x) \cdot zkpm(x)
+\end{aligned}
+$$";
+        assert_eq!(split_math_delimiters(input), expected);
+    }
+
+    #[test]
+    fn test_split_math_delimiters_already_split() {
+        // Should not affect already properly formatted blocks
+        let input = r"$$
+\begin{aligned}
+a &= b
+\end{aligned}
+$$";
+        assert_eq!(split_math_delimiters(input), input);
+    }
+
+    #[test]
+    fn test_split_math_delimiters_multiple_blocks() {
+        let input = r"First block:
+$$\begin{aligned}
+a &= b
+\end{aligned}$$
+
+Second block:
+$$\begin{aligned}
+c &= d
+\end{aligned}$$";
+        let expected = r"First block:
+$$
+\begin{aligned}
+a &= b
+\end{aligned}
+$$
+
+Second block:
+$$
+\begin{aligned}
+c &= d
+\end{aligned}
+$$";
+        assert_eq!(split_math_delimiters(input), expected);
     }
 
     #[test]

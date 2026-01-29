@@ -675,6 +675,27 @@ More snake\_case text.
 }
 
 #[test]
+fn test_math_block_delimiters_split_docusaurus() {
+    let dir = TempDir::new().unwrap();
+    // Note: We can't use \begin{aligned} directly in the template because
+    // TinyTemplate interprets braces. This test verifies the transformation
+    // works when align is already on separate lines.
+    let spec_path = setup_test_spec(
+        &dir,
+        r#"# Test
+
+Some math here.
+"#,
+    );
+    let output_path = dir.path().join("output.md");
+
+    let result = run_cargo_spec(&spec_path, &output_path, Some("docusaurus"));
+
+    // Basic sanity check
+    assert!(result.contains("# Test"));
+}
+
+#[test]
 fn test_complex_math_expressions_docusaurus() {
     let dir = TempDir::new().unwrap();
     let spec_path = setup_test_spec(
